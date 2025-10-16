@@ -1,30 +1,65 @@
-# MIDI Visualization Prototype
+# 🎹 MIDI-to-Video Conditioning & Verification Pipeline
 
-## Overview
-This project preprocesses MIDI files to generate Gaussian heatmaps representing note intensity over time. It is an early-stage university project aiming to transform MIDI data into animated visualizations of piano performances.
+This repository contains a full pipeline that transforms **MIDI files** and **piano performance videos** into structured **heatmaps** — representing both **key contact activations** and **hand skeleton motion**.  
 
-## Features
-- Converts MIDI files to piano roll matrices  
-- Generates Gaussian heatmaps to visualize note activity  
-- Provides static visualizations of time vs. pitch intensity  
+These multimodal representations are designed as **conditioning inputs for diffusion or generative models**, enabling future systems that can **synthesize realistic concert videos directly from MIDI**, and then **verify their correctness with computer vision**.
 
-## Skills Demonstrated
-- Python programming and data manipulation (`NumPy`, `pretty_midi`)  
-- Time-series visualization (`Matplotlib`)  
-- Understanding of MIDI file structure and piano roll representation  
+---
 
-## Future Work
-- Batch processing of multiple MIDI files  
-- Animated performance video generation  
-- Interactive web-based visualizations  
-- Predictive modeling or style analysis  
+## 🧭 Project Direction
 
-## Usage
-1. Install dependencies:
+### 🎯 Goal
+To build a **generative AI system** that can:
+1. **Generate realistic piano performance videos** (e.g., rendered in Unreal Engine) conditioned on MIDI input.
+2. **Use computer vision** to verify that the resulting visual keypresses and hand motions **match the musical content**.
+
+This repository focuses on the **representation learning stage** — producing accurate, aligned, and interpretable **conditioning data** that can drive and evaluate the generative model.
+
+---
+
+## ⚙️ What This Repository Does
+
+### ✅ From MIDI to Heatmaps
+- Converts MIDI files into **time-pitch contact maps (piano rolls)**.
+- Smooths with Gaussian filters to simulate **pedal sustain and legato**.
+- Produces **key contact heatmaps** representing note activations over time.
+
+### ✅ From Video to Skeleton Heatmaps
+- Uses **MediaPipe Hands** and **OpenCV** to extract 3D hand landmarks per frame.
+- Converts normalized keypoints into **Gaussian hand-skeleton heatmaps**.
+- Produces **left- and right-hand activation maps** showing pianist motion.
+
+### ✅ Combined Conditioning Tensor
+- Stacks:
+  1. MIDI contact map heatmap  
+  2. Left-hand skeleton heatmap  
+  3. Right-hand skeleton heatmap  
+  4. Keyboard template mask  
+- This 4-channel tensor can condition a **diffusion model** for video generation or be used for **alignment verification**.
+
+---
+
+## 🧠 Conceptual Pipeline
+
+🎵 MIDI File
+   ↓
+🎼 Piano Roll Extraction (PrettyMIDI)
+   ↓
+🔥 Gaussian Contact Heatmaps
+   ↓
+🎥 Hand Keypoint Extraction (MediaPipe)
+   ↓
+🖼️ Hand Heatmap + Keyboard Template
+   ↓
+📊 Control Tensor Construction
+   ↓
+✅ Verification: MIDI ↔ Video Alignment (Accuracy, Precision, Recall, F1)
+
+
+---
+
+## 🧰 Installation
+
 ```bash
-pip install numpy matplotlib pretty_midi
+pip install mediapipe opencv-python pretty_midi matplotlib pandas numpy scipy
 
-from task_a import midi_to_pianoroll, piano_roll_to_heatmap
-
-pianoroll = midi_to_pianoroll('path_to_your_midi_file.mid')
-heatmap = piano_roll_to_heatmap(pianoroll)
